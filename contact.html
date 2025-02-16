@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Explorer - Contact Us</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        /* Navbar styling */
+        nav {
+            background: rgba(0, 0, 0, 0.6); /* Updated to match the home page section */
+            padding: 8px 12px; /* Reduced padding to make the navbar smaller */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .logo img {
+            height: 40px; /* Adjusted logo height */
+            width: auto;
+        }
+
+        .nav-links a {
+            color: white; /* Updated text color for contrast */
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 10px; /* Reduced padding */
+            transition: color 0.3s ease, background 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .nav-links a:hover {
+            color: #f67280;
+            background: rgba(246, 114, 128, 0.1); /* Subtle hover background */
+        }
+
+        /* Search bar styling */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #fff;
+            padding: 3px 8px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .search-bar:hover {
+            box-shadow: 0 0 10px rgba(246, 114, 128, 0.2); /* Hover effect */
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            padding: 6px 10px;
+            font-size: 14px;
+            width: 150px;
+        }
+
+        .search-bar button {
+            background: #f67280;
+            border: none;
+            padding: 6px 10px;
+            color: white;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .search-bar button:hover {
+            background: #c06c84;
+            transform: scale(1.05); /* Button hover effect */
+        }
+
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #f67280;
+            transition: color 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            color: #c06c84; /* Toggle button hover effect */
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background: white;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                width: 200px;
+                padding: 10px 0;
+                border-radius: 8px;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 10px;
+                text-align: center;
+                font-size: 16px;
+                color: #333; /* Text color for mobile menu */
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+        }
+
+        /* Social Media Icons on the Left */
+        .social-media {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .social-media a {
+            color: white;
+            font-size: 18px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-media a:hover {
+            color: #f67280;
+            transform: translateY(-5px); /* Icon hover effect */
+        }
+
+        /* Contact Us Section */
+        .contact-us {
+            background-image: url('back.jpg'); /* Same background as home page */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .contact-us::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+        }
+
+        .contact-form {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            backdrop-filter: blur(5px); /* Blur effect */
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .contact-form h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .contact-form textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .contact-form button {
+            background: #f67280;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .contact-form button:hover {
+            background: #c06c84;
+            transform: scale(1.05); /* Button hover effect */
+        }
+    </style>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for social media icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">
+            <a href="index.html">
+                <img src="logo4.png" alt="Travel Explorer Logo">
+            </a>
+        </div>
+        <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+        <div class="nav-links">
+            <a href="travel_recom.html">Home</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+            <button type="submit">🔍</button>
+        </div>
+    </nav>
+
+    <!-- Social Media Icons on the Left -->
+    <div class="social-media">
+        <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://pinterest.com" target="_blank"><i class="fab fa-pinterest-p"></i></a>
+    </div>
+
+    <!-- Contact Us Section -->
+    <section class="contact-us">
+        <div class="contact-form">
+            <h1>Contact Us</h1>
+            <form>
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Your Email" required>
+                <textarea placeholder="Your Message" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        document.querySelector(".menu-toggle").addEventListener("click", function () {
+            document.querySelector(".nav-links").classList.toggle("active");
+        });
+    </script>
+</body>
+</html>
