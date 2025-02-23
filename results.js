@@ -1,162 +1,145 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const keyword = urlParams.get("query");
-
-    const searchButton = document.getElementById("search-btn");
-    const searchInput = document.getElementById("search-input");
-    const clearButton = document.getElementById("clear-btn");
-    const menuToggle = document.querySelector(".menu-toggle");
-    const navLinks = document.querySelector(".nav-links");
-
-    // Toggle Mobile Menu
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener("click", () => {
-            navLinks.classList.toggle("active");
-        });
-    }
-
-    // Handle Search
-    if (searchButton && searchInput) {
-        searchButton.addEventListener("click", performSearch);
-        searchInput.addEventListener("keypress", (event) => {
-            if (event.key === "Enter") performSearch();
-        });
-    }
-
-    // Handle Clear Button
-    if (clearButton) {
-        clearButton.addEventListener("click", clearResults);
-    }
-
-    // Fetch and display results if a keyword is present
-    if (keyword) {
-        fetchAndDisplayResults(keyword);
+// Function to handle the search button click
+function handleSearch() {
+    const searchInput = document.getElementById("search-input").value;
+    if (searchInput) {
+      // Redirect to the results page with the query parameter
+      window.location.href = `results.html?query=${encodeURIComponent(searchInput)}`;
     } else {
-        displayNoResults();
+      // If no input, redirect to the results page without a query parameter
+      window.location.href = "results.html";
     }
-
-    async function fetchAndDisplayResults(keyword) {
-        try {
-            const response = await fetch("travel_recom.json");
-            const data = await response.json();
-            const filteredResults = filterRecommendations(data, keyword);
-            displayRecommendations(filteredResults);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            displayNoResults();
-        }
+  }
+  
+  // Function to handle the clear button click
+  function handleClear() {
+    // Clear the search input and redirect to the results page without a query parameter
+    document.getElementById("search-input").value = "";
+    window.location.href = "results.html";
+  }
+  
+  // Add event listeners for the search and clear buttons
+  document.getElementById("search-button").addEventListener("click", handleSearch);
+  document.getElementById("clear-button").addEventListener("click", handleClear);
+  
+  // Add event listener for the Enter key
+  document.getElementById("search-input").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      handleSearch(); // Trigger the search function
     }
-
-    function filterRecommendations(data, keyword) {
-        const results = {
-            countries: [],
-            temples: [],
-            beaches: []
-        };
-
-        // Filter Countries and Cities
-        if (data.countries && Array.isArray(data.countries)) {
-            results.countries = data.countries.filter(country => {
-                const matchedCities = country.cities.filter(city =>
-                    city.name.toLowerCase().includes(keyword) ||
-                    city.description.toLowerCase().includes(keyword)
-                );
-                return country.name.toLowerCase().includes(keyword) || matchedCities.length > 0;
-            });
-        }
-
-        // Filter Temples and Beaches
-        ["temples", "beaches"].forEach(category => {
-            if (data[category] && Array.isArray(data[category])) {
-                results[category] = data[category].filter(item =>
-                    item.name.toLowerCase().includes(keyword) ||
-                    item.description.toLowerCase().includes(keyword)
-                );
-            }
-        });
-
-        return results;
+  });
+  
+  // Function to normalize the query and handle variations
+  function normalizeQuery(query) {
+    if (!query) return "";
+  
+    // Convert to lowercase and trim whitespace
+    const cleanQuery = query.trim().toLowerCase();
+  
+    // Handle variations of keywords
+    if (cleanQuery.includes("beach") || cleanQuery.includes("beaches")) {
+      return "beach";
+    } else if (cleanQuery.includes("temple") || cleanQuery.includes("temples")) {
+      return "temple";
+    } else if (cleanQuery.includes("country") || cleanQuery.includes("countries")) {
+      return "country";
+    } else {
+      return cleanQuery; // Return the original query if no match
     }
-
-    function displayRecommendations(filteredResults) {
-        const container = document.getElementById("resultsContainer");
-        if (!container) return;
-
-        container.innerHTML = "";
-
-        // Display Filtered Countries and Cities
-        if (filteredResults.countries.length > 0) {
-            filteredResults.countries.forEach(country => {
-                const countryCard = document.createElement("div");
-                countryCard.classList.add("recommendation-card");
-                countryCard.innerHTML = `<h3>${country.name}</h3>`;
-                container.appendChild(countryCard);
-
-                country.cities.forEach(city => {
-                    const cityCard = document.createElement("div");
-                    cityCard.classList.add("recommendation-card");
-                    const imageUrl = city.imageUrl || "images/default.jpg";
-                    cityCard.innerHTML = `
-                        <img src="${imageUrl}" alt="${city.name}" onerror="this.src='images/default.jpg'">
-                        <h3>${city.name}</h3>
-                        <p>${city.description}</p>
-                        <button class="book-btn" onclick="bookDestination('${city.name}')">Book Now</button>
-                    `;
-                    container.appendChild(cityCard);
-                });
-            });
-        }
-
-        // Display Filtered Temples and Beaches
-        ["temples", "beaches"].forEach(category => {
-            if (filteredResults[category].length > 0) {
-                filteredResults[category].forEach(item => {
-                    const card = document.createElement("div");
-                    card.classList.add("recommendation-card");
-                    const imageUrl = item.imageUrl || "images/default.jpg";
-                    card.innerHTML = `
-                        <img src="${imageUrl}" alt="${item.name}" onerror="this.src='images/default.jpg'">
-                        <h3>${item.name}</h3>
-                        <p>${item.description}</p>
-                        <button class="book-btn" onclick="bookDestination('${item.name}')">Book Now</button>
-                    `;
-                    container.appendChild(card);
-                });
-            }
-        });
-
-        // Show a message if no results are found
-        if (container.innerHTML === "") {
-            displayNoResults();
-        }
+  }
+  
+  // Function to filter data based on the normalized query
+  function filterData(data, query) {
+    if (!query) {
+      return []; // Return empty array if no query is provided
     }
-
-    function displayNoResults() {
-        const container = document.getElementById("resultsContainer");
-        if (container) {
-            container.innerHTML = `<p class="no-results">No results found for your search.</p>`;
-        }
+  
+    const normalizedQuery = normalizeQuery(query);
+  
+    if (normalizedQuery === "beach") {
+      return data.beaches; // Return beaches data
+    } else if (normalizedQuery === "temple") {
+      return data.temples; // Return temples data
+    } else if (normalizedQuery === "country") {
+      return data.countries.flatMap(country => country.cities); // Return cities data
+    } else {
+      // Fallback: Filter by name if no keyword match
+      return data.countries.flatMap(country => country.cities)
+        .concat(data.temples)
+        .concat(data.beaches)
+        .filter(item => item.name.toLowerCase().includes(normalizedQuery));
     }
-
-    function clearResults() {
-        const container = document.getElementById("resultsContainer");
-        if (container) {
-            container.innerHTML = ""; // Clear the results container
-        }
-        const searchInput = document.getElementById("search-input");
-        if (searchInput) {
-            searchInput.value = ""; // Clear the search input field
-        }
+  }
+  
+  // Function to display search results
+  function displayResults(results) {
+    const container = document.getElementById("results-container");
+    if (!container) {
+      console.error("Results container not found!");
+      return;
     }
-
-    function performSearch() {
-        const keyword = searchInput.value.trim().toLowerCase();
-        if (!keyword) {
-            alert("Please enter a search term.");
-            return;
-        }
-
-        // Redirect to the same page with the search keyword as a query parameter
-        window.location.href = `travel_recom.html?query=${encodeURIComponent(keyword)}`;
+    container.innerHTML = ""; // Clear previous results
+  
+    if (results.length > 0) {
+      results.forEach(item => {
+        const itemElement = document.createElement("div");
+        itemElement.classList.add("result");
+  
+        // Create image element
+        const image = document.createElement("img");
+        image.src = item.imageUrl;
+        image.alt = item.name;
+        image.classList.add("result-image"); // Add a class for styling
+  
+        // Create name element
+        const name = document.createElement("h3");
+        name.textContent = item.name;
+  
+        // Create description element
+        const description = document.createElement("p");
+        description.textContent = item.description;
+  
+        // Create "Book Now" button
+        const bookNowButton = document.createElement("button");
+        bookNowButton.textContent = "Book Now";
+        bookNowButton.classList.add("book-now-button"); // Add a class for styling
+  
+        // Append elements to the result container
+        itemElement.appendChild(image);
+        itemElement.appendChild(name);
+        itemElement.appendChild(description);
+        itemElement.appendChild(bookNowButton);
+  
+        // Append the result to the main container
+        container.appendChild(itemElement);
+      });
+    } else {
+      container.innerHTML = "<p>No results found for your search.</p>";
     }
-});
+  }
+  
+  // Fetch the data from the JSON file and display the results based on the query
+  async function loadDataAndDisplayResults() {
+    try {
+      const response = await fetch("travel_recom.json");
+      const data = await response.json();
+  
+      // Retrieve the query parameter from the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const query = urlParams.get("query");
+  
+      // Filter the data based on the query (if provided)
+      const filteredResults = query ? filterData(data, query) : [];
+  
+      // Debug: Log filtered results
+      console.log("Filtered Results:", filteredResults);
+  
+      // Display the filtered data
+      displayResults(filteredResults);
+  
+    } catch (error) {
+      console.error("Error fetching the data:", error);
+    }
+  }
+  
+  // Load the data and display results when the page loads
+  window.onload = loadDataAndDisplayResults;
